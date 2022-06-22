@@ -91,52 +91,43 @@ func search(mainSlice *[]board_t) int {
 }
 
 func parse(mainSlice *[]board_t) {
-	var b board_t
 	words := strings.Fields(matrixes)
-	var iteration int
-	b.lookup = map[int]coordinate_t{}
-	var linker = map[int]coordinate_t{}
-	for _, n := range words {
-		if iteration == 0 {
-			for k := range linker {
-				delete(linker, k)
-			}
-			linker = make(map[int]coordinate_t)
+	length := len(words)
+	for matrixCounter := 0;; matrixCounter++ {
+		var b board_t
+		b.lookup = map[int]coordinate_t{}
+		for counter := 0; counter < 25; counter++ {
+			index := (matrixCounter*25)+counter
+			if index < length {
+				number, _ := strconv.Atoi(words[index])
+				b.matrix[counter/5][counter%5] = number
+				b.sum += number
+				var coordinate coordinate_t
+				coordinate.x = counter % 5
+				coordinate.y = counter / 5
+				b.lookup[number] = coordinate
+			}else{
+				if len(b.lookup) > 0{
+					*mainSlice = append(*mainSlice, b)
+				}
+				return
+			} 
+			
 		}
-		number, _ := strconv.Atoi(n)
-		b.matrix[iteration/5][iteration%5] = number
-		b.sum += number
-		var coordinate coordinate_t
-		coordinate.x = iteration % 5
-		coordinate.y = iteration / 5
-
-		linker[number] = coordinate
-		if iteration == 24 {
-			copy := func(b map[int]coordinate_t) map[int]coordinate_t { return b }
-			b.lookup = copy(linker)
-			*mainSlice = append(*mainSlice, b)
-			iteration = 0
-
-			// for m, k := range (*mainSlice)[0].lookup {
-			// 	fmt.Println(m, k)
-			// }
-			// fmt.Println(b.matrix)
-		} else {
-			iteration++
-		}
+		*mainSlice = append(*mainSlice, b)
 	}
 }
 
 func main() {
 	var mainSlice []board_t
 	parse(&mainSlice)
-	for _, i := range mainSlice{
-		fmt.Println("lol")
-		for m, k := range i.lookup{
-			fmt.Println(m,k)
-		}
-		fmt.Println(i.matrix)
-	}
+	// for _, i := range mainSlice {
+	// 	fmt.Println("lol")
+	// 	for m, k := range i.lookup {
+	// 		fmt.Println(m, k)
+	// 	}
+	// 	fmt.Println(i.matrix)
+	// }
 	var result int = search(&mainSlice)
 	fmt.Println(len(mainSlice))
 	fmt.Printf("The result is:	%d\n", result)
